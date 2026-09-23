@@ -2,7 +2,7 @@
 
 Aplicação para consultar e explorar cartas de Magic: The Gathering usando a API pública do Scryfall.
 
-A Fase 1 deixa o projeto executável com Next.js, TypeScript strict, ESLint, Prettier e Vitest. A interface, a integração com a API e o restante da documentação entram nas fases seguintes.
+O projeto usa Next.js, TypeScript strict, ESLint, Prettier e Vitest. O estado remoto fica no TanStack Query, com tipos de domínio separados da resposta bruta do Scryfall. A interface, a busca e o restante da documentação entram nas fases seguintes.
 
 ## Getting Started
 
