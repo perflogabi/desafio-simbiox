@@ -1,8 +1,11 @@
+import { Explorer } from "@/components/Explorer/Explorer";
+import { PageShell } from "@/components/PageShell/PageShell";
+import { sampleCards } from "@/fixtures/sampleCards";
+
 export default function HomePage() {
   return (
-    <main>
-      <h1>Card Explorer</h1>
-      <p>Explore cartas de Magic: The Gathering.</p>
-    </main>
+    <PageShell>
+      <Explorer cards={sampleCards} />
+    </PageShell>
   );
 }

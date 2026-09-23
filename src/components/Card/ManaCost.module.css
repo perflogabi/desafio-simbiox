@@ -1,0 +1,48 @@
+.cost {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0.2rem;
+}
+
+.pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.white {
+  background: #f4f0e4;
+  color: #1c1914;
+}
+
+.blue {
+  background: #2f5f96;
+  color: #f4f0e6;
+}
+
+.black {
+  border: 1px solid #b7b7b7;
+  background: #242424;
+  color: #f4f0e6;
+}
+
+.red {
+  background: #a84538;
+  color: #fff8f5;
+}
+
+.green {
+  background: #2f6a40;
+  color: #f4f0e6;
+}
+
+.generic {
+  background: #c5c0b6;
+  color: #1c1914;
+}

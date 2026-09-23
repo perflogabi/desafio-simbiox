@@ -1,0 +1,91 @@
+.filter {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.legend {
+  float: right;
+  margin-bottom: 0.4rem;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.options {
+  display: flex;
+  clear: right;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0;
+}
+
+.option[aria-pressed="true"] {
+  border-color: var(--gold-strong);
+}
+
+.pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.white {
+  background: #f4f0e4;
+  color: #1c1914;
+}
+
+.blue {
+  background: #2f5f96;
+  color: #f4f0e6;
+}
+
+.black {
+  border: 1px solid #b7b7b7;
+  background: #242424;
+  color: #f4f0e6;
+}
+
+.red {
+  background: #a84538;
+  color: #fff8f5;
+}
+
+.green {
+  background: #2f6a40;
+  color: #f4f0e6;
+}
+
+.colorless {
+  border: 1px solid #c9bfb0;
+  color: #f4f0e6;
+}
+
+@media (max-width: 899px) {
+  .legend {
+    float: none;
+  }
+
+  .options {
+    justify-content: flex-start;
+  }
+}

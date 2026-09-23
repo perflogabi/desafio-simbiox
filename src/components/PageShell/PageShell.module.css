@@ -1,0 +1,5 @@
+.shell {
+  width: min(var(--page-width), calc(100% - 2 * var(--page-gutter)));
+  margin-inline: auto;
+  padding-block: 1.75rem 4rem;
+}

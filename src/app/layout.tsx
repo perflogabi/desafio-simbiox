@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Header } from "@/components/Header/Header";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
@@ -11,7 +12,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR">
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <a className="skipLink" href="#conteudo">
+            Ir para o conteúdo
+          </a>
+          <Header />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

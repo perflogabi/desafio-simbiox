@@ -1,0 +1,203 @@
+.card {
+  --frame: #32343a;
+  --frame-text: var(--text);
+  --accent: #c5c8d0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition:
+    transform var(--transition),
+    border-color var(--transition);
+}
+
+.card[data-frame="R"] {
+  --frame: #6a2e28;
+  --accent: #e7b2a4;
+}
+
+.card[data-frame="G"] {
+  --frame: #1f4a34;
+  --accent: #b7d7c2;
+}
+
+.card[data-frame="U"] {
+  --frame: #1d3f6b;
+  --accent: #b9d0ea;
+}
+
+.card[data-frame="W"] {
+  --frame: #e6e0d2;
+  --frame-text: #1c1914;
+  --accent: #d9d3c4;
+}
+
+.card[data-frame="C"] {
+  --frame: #3c3934;
+  --accent: #d5cfc3;
+}
+
+.card[data-frame="M"] {
+  --frame: #6b5424;
+  --accent: #f0ddb0;
+}
+
+.card[data-selected="true"],
+.card:has(.open:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.open:focus-visible {
+  outline: none;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  }
+}
+
+.heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-height: 3.25rem;
+  padding: 0.75rem 2.5rem 0.7rem 0.85rem;
+  background: var(--frame);
+  color: var(--frame-text);
+}
+
+.name {
+  flex: 1;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.favorite {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.35rem;
+  z-index: 2;
+}
+
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.imageWrap {
+  padding: 0.7rem 0.7rem 0.35rem;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #0a0908;
+}
+
+.fallback {
+  display: grid;
+  aspect-ratio: 63 / 88;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.typeRow,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-inline: 0.85rem;
+}
+
+.typeRow {
+  padding-top: 0.35rem;
+}
+
+.type {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.set {
+  flex-shrink: 0;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 0.05rem 0.35rem;
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.oracleBlock {
+  position: relative;
+  flex: 1;
+  min-height: 5.6rem;
+  padding: 0.45rem 3.2rem 0.7rem 0.85rem;
+}
+
+.oracle {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.power {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.55rem;
+  border-radius: var(--radius-sm);
+  background: #7a6233;
+  padding: 0.08rem 0.4rem;
+  color: #f8f1df;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.footer {
+  margin-top: auto;
+  padding-bottom: 0.75rem;
+}
+
+.rarity {
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.artist {
+  overflow: hidden;
+  max-width: 58%;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
