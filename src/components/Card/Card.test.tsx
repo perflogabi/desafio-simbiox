@@ -24,7 +24,7 @@ const card: MagicCard = {
 };
 
 describe("Card", () => {
-  it("shows the name, illustration and rarity", () => {
+  it("shows the illustration without repeating the oracle text", () => {
     render(
       <Card
         card={card}
@@ -41,7 +41,11 @@ describe("Card", () => {
     expect(
       screen.getByRole("img", { name: "Ilustração de Syr Konrad, the Grim" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Incomum")).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "Whenever another creature dies, Syr Konrad deals 1 damage.",
+      ),
+    ).not.toBeInTheDocument();
   });
 
   it("selects the card without toggling the favorite", () => {

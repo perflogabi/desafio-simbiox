@@ -104,6 +104,35 @@ describe("Explorer", () => {
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("opens card details and closes them with Escape", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse(listOf(["Syr Konrad, the Grim"]))),
+    );
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar cartas" }), {
+      target: { value: "konrad" },
+    });
+
+    const open = await screen.findByRole("button", {
+      name: "Syr Konrad, the Grim Creature — Test",
+    });
+    open.focus();
+    fireEvent.click(open);
+
+    expect(
+      screen.getByRole("dialog", { name: "Syr Konrad, the Grim" }),
+    ).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(
+      screen.queryByRole("dialog", { name: "Syr Konrad, the Grim" }),
+    ).not.toBeInTheDocument();
+    expect(open).toHaveFocus();
+  });
 });
 
 function listOf(names: readonly string[]) {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CardGrid } from "@/components/CardGrid/CardGrid";
+import { CardModal } from "@/components/CardModal/CardModal";
 import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { ErrorState } from "@/components/ErrorState/ErrorState";
 import { CardSkeletonGrid } from "@/components/Skeleton/CardSkeleton";
@@ -15,16 +16,12 @@ const VISIBLE_BATCH = 18;
 type SearchResultsProps = {
   filters: CardSearchFilters | null;
   favoriteIds: ReadonlySet<string>;
-  selectedId: string | null;
-  onSelect: (cardId: string) => void;
   onToggleFavorite: (cardId: string) => void;
 };
 
 export function SearchResults({
   filters,
   favoriteIds,
-  selectedId,
-  onSelect,
   onToggleFavorite,
 }: SearchResultsProps) {
   const search = useCards(filters);
@@ -34,17 +31,24 @@ export function SearchResults({
     identity,
     count: VISIBLE_BATCH,
   });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   if (windowState.identity !== identity) {
     setWindowState({ identity, count: VISIBLE_BATCH });
+
+    if (selectedId !== null) {
+      setSelectedId(null);
+    }
   }
 
   const visibleCount =
     windowState.identity === identity ? windowState.count : VISIBLE_BATCH;
+  const activeId = windowState.identity === identity ? selectedId : null;
   const fetched = search.data?.pages.flatMap((page) => page.cards) ?? [];
   const total = search.data?.pages[0]?.total ?? 0;
   const shown = fetched.slice(0, visibleCount);
   const canRevealMore = visibleCount < fetched.length || search.hasNextPage;
+  const selectedCard = fetched.find((card) => card.id === activeId) ?? null;
 
   if (filters === null) {
     return (
@@ -102,10 +106,22 @@ export function SearchResults({
       <CardGrid
         cards={shown}
         favoriteIds={favoriteIds}
-        selectedId={selectedId}
-        onSelect={onSelect}
+        selectedId={activeId}
+        onSelect={setSelectedId}
         onToggleFavorite={onToggleFavorite}
       />
+      {selectedCard ? (
+        <CardModal
+          card={selectedCard}
+          isFavorite={favoriteIds.has(selectedCard.id)}
+          onClose={() => {
+            setSelectedId(null);
+          }}
+          onToggleFavorite={() => {
+            onToggleFavorite(selectedCard.id);
+          }}
+        />
+      ) : null}
       {search.isFetchNextPageError ? (
         <ErrorState
           title="Não foi possível carregar mais cartas"

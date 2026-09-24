@@ -19,7 +19,6 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const debouncedQuery = useDebounce(query, debounceMs);
   const filters = toFilters(debouncedQuery, color);
 
@@ -37,10 +36,6 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
     });
   }
 
-  function selectCard(cardId: string) {
-    setSelectedId((current) => (current === cardId ? null : cardId));
-  }
-
   return (
     <main id="conteudo">
       <div className={styles.toolbar}>
@@ -56,8 +51,6 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
       <SearchResults
         filters={filters}
         favoriteIds={favoriteIds}
-        selectedId={selectedId}
-        onSelect={selectCard}
         onToggleFavorite={toggleFavorite}
       />
     </main>
