@@ -10,12 +10,12 @@ describe("cardQueryKeys", () => {
     ]);
   });
 
-  it("changes the key when the text or the color changes", () => {
+  it("changes the key when the text or a filter changes", () => {
     const first = cardQueryKeys.search({ query: "lotus" });
-    const withColor = cardQueryKeys.search({ query: "lotus", color: "B" });
+    const withRarity = cardQueryKeys.search({ query: "lotus", rarity: "rare" });
     const otherText = cardQueryKeys.search({ query: "etali" });
 
-    expect(withColor).not.toEqual(first);
+    expect(withRarity).not.toEqual(first);
     expect(otherText).not.toEqual(first);
   });
 });

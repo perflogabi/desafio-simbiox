@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { ColorFilter } from "@/components/ColorFilter/ColorFilter";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FilterBar } from "@/components/Filters/FilterBar";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { SectionRule } from "@/components/SectionRule/SectionRule";
 import { useDebounce } from "@/hooks/useDebounce";
-import type { CardColorFilter, CardSearchFilters } from "@/types/card";
+import { hrefForFilters, readAppliedFilters } from "@/lib/urlFilters";
+import type { CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
 import { SearchResults } from "./SearchResults";
 
@@ -14,13 +16,54 @@ type ExplorerProps = {
 };
 
 export function Explorer({ debounceMs = 300 }: ExplorerProps) {
-  const [query, setQuery] = useState("");
-  const [color, setColor] = useState<CardColorFilter | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const applied = readAppliedFilters(useSearchParams());
+  const appliedQuery = applied.query;
+  const appliedRarity = applied.rarity;
+  const appliedType = applied.type;
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
-  const debouncedQuery = useDebounce(query, debounceMs);
-  const filters = toFilters(debouncedQuery, color);
+  const [text, setText] = useState(appliedQuery);
+  const [seenQuery, setSeenQuery] = useState(appliedQuery);
+  const debouncedQuery = useDebounce(text, debounceMs);
+
+  if (appliedQuery !== seenQuery) {
+    setSeenQuery(appliedQuery);
+
+    if (appliedQuery !== debouncedQuery.trim()) {
+      setText(appliedQuery);
+    }
+  }
+
+  useEffect(() => {
+    const nextQuery = debouncedQuery.trim();
+
+    if (
+      nextQuery === appliedQuery ||
+      (text.trim() === appliedQuery && nextQuery !== text.trim())
+    ) {
+      return;
+    }
+
+    router.replace(
+      hrefForFilters(pathname, {
+        query: nextQuery,
+        rarity: appliedRarity,
+        type: appliedType,
+      }),
+      { scroll: false },
+    );
+  }, [
+    appliedQuery,
+    appliedRarity,
+    appliedType,
+    debouncedQuery,
+    pathname,
+    router,
+    text,
+  ]);
 
   function toggleFavorite(cardId: string) {
     setFavoriteIds((current) => {
@@ -36,20 +79,51 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
     });
   }
 
+  function replaceFilters(next: typeof applied) {
+    router.replace(hrefForFilters(pathname, next), { scroll: false });
+  }
+
   return (
     <main id="conteudo">
       <div className={styles.toolbar}>
         <h1 className={styles.title}>Compêndio</h1>
-        <div className={styles.search}>
-          <SearchBar value={query} onValueChange={setQuery} />
-        </div>
-        <div className={styles.colors}>
-          <ColorFilter value={color} onChange={setColor} />
+        <div className={styles.searchRow}>
+          <div className={styles.search}>
+            <SearchBar value={text} onValueChange={setText} />
+          </div>
+          <FilterBar
+            applied={applied}
+            onApply={(draft) => {
+              replaceFilters({
+                query: text.trim(),
+                rarity: draft.rarity,
+                type: draft.type,
+              });
+            }}
+            onClear={() => {
+              replaceFilters({
+                query: text.trim(),
+                rarity: null,
+                type: null,
+              });
+            }}
+            onRemove={(kind) => {
+              replaceFilters({
+                query: text.trim(),
+                rarity: kind === "rarity" ? null : appliedRarity,
+                type: kind === "type" ? null : appliedType,
+              });
+            }}
+          />
         </div>
       </div>
       <SectionRule />
       <SearchResults
-        filters={filters}
+        filters={toFilters({
+          query: debouncedQuery,
+          rarity: appliedRarity,
+          type: appliedType,
+        })}
         favoriteIds={favoriteIds}
         onToggleFavorite={toggleFavorite}
       />
@@ -57,19 +131,20 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
   );
 }
 
-function toFilters(
-  query: string,
-  color: CardColorFilter | null,
-): CardSearchFilters | null {
-  const text = query.trim();
+function toFilters(applied: {
+  query: string;
+  rarity: CardSearchFilters["rarity"] | null;
+  type: CardSearchFilters["type"] | null;
+}): CardSearchFilters | null {
+  const query = applied.query.trim();
 
-  if (text.length === 0 && color === null) {
+  if (query.length === 0 && applied.rarity === null && applied.type === null) {
     return null;
   }
 
-  if (color === null) {
-    return { query: text };
-  }
-
-  return { query: text, color };
+  return {
+    query,
+    ...(applied.rarity ? { rarity: applied.rarity } : {}),
+    ...(applied.type ? { type: applied.type } : {}),
+  };
 }

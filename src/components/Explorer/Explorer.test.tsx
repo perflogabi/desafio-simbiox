@@ -1,6 +1,7 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Explorer } from "@/components/Explorer/Explorer";
+import { getSearchParams, resetSearchParams } from "@/test/navigationState";
 import { renderWithClient } from "@/test/renderWithClient";
 
 describe("Explorer", () => {
@@ -24,7 +25,10 @@ describe("Explorer", () => {
       "Carregando cartas",
     );
 
-    resolveFetch(jsonResponse(listOf(["Syr Konrad, the Grim"])));
+    await act(async () => {
+      resolveFetch(jsonResponse(listOf(["Syr Konrad, the Grim"])));
+      await pending;
+    });
 
     expect(
       await screen.findByRole("heading", { name: "Syr Konrad, the Grim" }),
@@ -132,6 +136,158 @@ describe("Explorer", () => {
       screen.queryByRole("dialog", { name: "Syr Konrad, the Grim" }),
     ).not.toBeInTheDocument();
     expect(open).toHaveFocus();
+  });
+
+  it("applies rarity and type only after Aplicar and reflects them in the URL", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse(listOf(["Dragon"])));
+    vi.stubGlobal("fetch", fetchMock);
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    const filters = screen.getByRole("button", { name: "Filtros" });
+    expect(filters).toHaveAttribute("aria-expanded", "false");
+    filters.focus();
+    fireEvent.click(filters);
+
+    expect(filters).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Rara" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Tipo/ }));
+    fireEvent.click(screen.getByRole("option", { name: "Criatura" }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    expect(
+      screen.queryByRole("dialog", { name: "Filtros" }),
+    ).not.toBeInTheDocument();
+    expect(getSearchParams().get("rarity")).toBe("rare");
+    expect(getSearchParams().get("type")).toBe("creature");
+    expect(getSearchParams().get("q")).toBeNull();
+
+    const target = fetchMock.mock.calls[0]?.[0];
+    expect(target).toBeInstanceOf(URL);
+    if (target instanceof URL) {
+      expect(target.searchParams.get("q")).toBe("rarity:rare type:creature");
+    }
+
+    expect(
+      await screen.findByRole("button", { name: "Remover filtro Rara" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Remover filtro Criatura" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Filtros/ })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  it("restores filters from the URL", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse(listOf(["Dragon"])));
+    vi.stubGlobal("fetch", fetchMock);
+    resetSearchParams("q=dragon&rarity=rare&type=creature");
+
+    renderWithClient(<Explorer debounceMs={0} />);
+
+    expect(
+      screen.getByRole("searchbox", { name: "Buscar cartas" }),
+    ).toHaveValue("dragon");
+    expect(
+      screen.getByRole("button", { name: "Remover filtro Rara" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Dragon" }),
+    ).toBeInTheDocument();
+
+    const target = fetchMock.mock.calls[0]?.[0];
+    expect(target).toBeInstanceOf(URL);
+    if (target instanceof URL) {
+      expect(target.searchParams.get("q")).toBe(
+        "dragon rarity:rare type:creature",
+      );
+    }
+  });
+
+  it("clears rarity and type and keeps the text search", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse(listOf(["Dragon"]))),
+    );
+    resetSearchParams("q=dragon&rarity=rare&type=creature");
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    const filters = screen.getByRole("button", { name: /Filtros/ });
+    filters.focus();
+    fireEvent.click(filters);
+    fireEvent.click(screen.getByRole("button", { name: "Limpar" }));
+
+    expect(getSearchParams().get("q")).toBe("dragon");
+    expect(getSearchParams().get("rarity")).toBeNull();
+    expect(getSearchParams().get("type")).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Remover filtro Rara" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("searchbox", { name: "Buscar cartas" }),
+    ).toHaveValue("dragon");
+  });
+
+  it("removes one filter from its chip", () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse(listOf(["Dragon"]))),
+    );
+    resetSearchParams("q=dragon&rarity=rare&type=creature");
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Remover filtro Rara" }),
+    );
+
+    expect(getSearchParams().get("rarity")).toBeNull();
+    expect(getSearchParams().get("type")).toBe("creature");
+    expect(
+      screen.queryByRole("button", { name: "Remover filtro Rara" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Remover filtro Criatura" }),
+    ).toBeInTheDocument();
+  });
+
+  it("closes the filter panel with Escape and returns focus", () => {
+    renderWithClient(<Explorer debounceMs={0} />);
+    const filters = screen.getByRole("button", { name: "Filtros" });
+    filters.focus();
+    fireEvent.click(filters);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(
+      screen.queryByRole("dialog", { name: "Filtros" }),
+    ).not.toBeInTheDocument();
+    expect(filters).toHaveFocus();
+  });
+
+  it("opens a dialog with a close button on a narrow screen", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: true,
+        media: "(max-width: 719px)",
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }),
+    );
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.click(screen.getByRole("button", { name: "Filtros" }));
+
+    expect(screen.getByRole("dialog", { name: "Filtros" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Fechar" })).toBeInTheDocument();
   });
 });
 

@@ -26,7 +26,9 @@ export function SearchResults({
 }: SearchResultsProps) {
   const search = useCards(filters);
   const identity =
-    filters === null ? "idle" : `${filters.query}|${filters.color ?? ""}`;
+    filters === null
+      ? "idle"
+      : `${filters.query}|${filters.rarity ?? ""}|${filters.type ?? ""}`;
   const [windowState, setWindowState] = useState({
     identity,
     count: VISIBLE_BATCH,
@@ -54,7 +56,7 @@ export function SearchResults({
     return (
       <EmptyState
         title="Busque uma carta"
-        description="Digite um nome ou escolha uma cor para explorar o Scryfall."
+        description="Digite um nome ou aplique um filtro para explorar o Scryfall."
       />
     );
   }

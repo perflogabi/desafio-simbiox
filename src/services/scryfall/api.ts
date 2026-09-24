@@ -25,7 +25,7 @@ export async function searchCards(
   params: CardSearchParams,
   signal?: AbortSignal,
 ): Promise<CardPage> {
-  const q = buildSearchQuery(params.query, params.color);
+  const q = buildSearchQuery(params);
 
   if (q.length === 0) {
     return EMPTY_PAGE;

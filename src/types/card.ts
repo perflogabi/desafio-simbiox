@@ -2,8 +2,26 @@ export const MANA_COLORS = ["W", "U", "B", "R", "G"] as const;
 
 export type ManaColor = (typeof MANA_COLORS)[number];
 
-/** Filtro de busca. "colorless" não é uma cor da carta; é a ausência de cores. */
-export type CardColorFilter = ManaColor | "colorless";
+export const SEARCH_RARITIES = [
+  "common",
+  "uncommon",
+  "rare",
+  "mythic",
+] as const;
+
+export type SearchRarity = (typeof SEARCH_RARITIES)[number];
+
+export const SEARCH_TYPES = [
+  "creature",
+  "artifact",
+  "enchantment",
+  "sorcery",
+  "instant",
+  "planeswalker",
+  "land",
+] as const;
+
+export type SearchType = (typeof SEARCH_TYPES)[number];
 
 export const CARD_RARITIES = [
   "common",
@@ -45,7 +63,8 @@ export interface Card {
 
 export interface CardSearchFilters {
   query: string;
-  color?: CardColorFilter;
+  rarity?: SearchRarity;
+  type?: SearchType;
 }
 
 export interface CardSearchParams extends CardSearchFilters {

@@ -1,7 +1,15 @@
 .toolbar {
   display: grid;
-  gap: 1.25rem;
-  align-items: end;
+  gap: 1rem;
+}
+
+.searchRow {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.search {
+  min-width: 0;
 }
 
 .title {
@@ -45,18 +53,16 @@
   opacity: 0.7;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 720px) {
   .toolbar {
-    grid-template-columns: 9rem minmax(16rem, 28rem) auto;
-    justify-content: space-between;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 1.5rem;
   }
 
-  .search {
-    justify-self: center;
-    width: min(100%, 28rem);
-  }
-
-  .colors {
-    justify-self: end;
+  .searchRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
   }
 }

@@ -1,9 +1,35 @@
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, vi } from "vitest";
+import { resetSearchParams } from "./src/test/navigationState";
+
+configure({ asyncUtilTimeout: 4_000 });
 
 afterEach(() => {
   cleanup();
+  resetSearchParams();
+});
+
+vi.mock("next/navigation", async () => {
+  const React = await import("react");
+  const navigation = await import("./src/test/navigationState");
+  const router = {
+    replace: (url: string) => {
+      const query = url.includes("?") ? url.slice(url.indexOf("?") + 1) : "";
+      navigation.resetSearchParams(query);
+    },
+  };
+
+  return {
+    usePathname: () => "/",
+    useRouter: () => router,
+    useSearchParams: () =>
+      React.useSyncExternalStore(
+        navigation.subscribeSearchParams,
+        navigation.getSearchParams,
+        navigation.getSearchParams,
+      ),
+  };
 });
 
 vi.mock("next/image", () => ({
