@@ -57,10 +57,12 @@ export function SearchResults({
 
   if (filters === null) {
     return (
-      <EmptyState
-        title="Busque uma carta"
-        description="Digite um nome ou aplique um filtro para explorar o Scryfall."
-      />
+      <section className={styles.hint}>
+        <h2 className={styles.hintTitle}>As cartas aparecem aqui</h2>
+        <p className={styles.hintText}>
+          Busque pelo nome ou filtre por raridade e tipo.
+        </p>
+      </section>
     );
   }
 

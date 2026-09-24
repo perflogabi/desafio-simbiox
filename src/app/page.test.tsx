@@ -20,7 +20,7 @@ describe("HomePage", () => {
       screen.getByRole("searchbox", { name: "Buscar cartas" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Busque uma carta" }),
+      screen.getByRole("heading", { name: "As cartas aparecem aqui" }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
 

@@ -12,6 +12,24 @@
   min-width: 0;
 }
 
+.hint {
+  max-width: 28rem;
+  padding-top: 0.35rem;
+}
+
+.hintTitle {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.hintText {
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
 .count {
   margin-bottom: 1rem;
   color: var(--text-muted);
