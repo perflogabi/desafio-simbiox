@@ -43,10 +43,13 @@ export interface Card {
   images: CardImages | null;
 }
 
-export interface CardSearchParams {
+export interface CardSearchFilters {
   query: string;
-  page: number;
   color?: CardColorFilter;
+}
+
+export interface CardSearchParams extends CardSearchFilters {
+  page: number;
 }
 
 export interface CardPage {

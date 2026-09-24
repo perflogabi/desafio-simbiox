@@ -1,27 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { CardGrid } from "@/components/CardGrid/CardGrid";
 import { ColorFilter } from "@/components/ColorFilter/ColorFilter";
-import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { SectionRule } from "@/components/SectionRule/SectionRule";
-import type { Card, CardColorFilter } from "@/types/card";
-import { filterCards } from "@/utils/filterCards";
+import { useDebounce } from "@/hooks/useDebounce";
+import type { CardColorFilter, CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
+import { SearchResults } from "./SearchResults";
 
 type ExplorerProps = {
-  cards: readonly Card[];
+  debounceMs?: number;
 };
 
-export function Explorer({ cards }: ExplorerProps) {
+export function Explorer({ debounceMs = 300 }: ExplorerProps) {
   const [query, setQuery] = useState("");
   const [color, setColor] = useState<CardColorFilter | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const visibleCards = filterCards(cards, query, color);
+  const debouncedQuery = useDebounce(query, debounceMs);
+  const filters = toFilters(debouncedQuery, color);
 
   function toggleFavorite(cardId: string) {
     setFavoriteIds((current) => {
@@ -53,23 +53,30 @@ export function Explorer({ cards }: ExplorerProps) {
         </div>
       </div>
       <SectionRule />
-      <p className={styles.count} role="status">
-        {visibleCards.length} de {cards.length}
-      </p>
-      {visibleCards.length === 0 ? (
-        <EmptyState
-          title="Nenhuma carta encontrada"
-          description="Tente outra busca."
-        />
-      ) : (
-        <CardGrid
-          cards={visibleCards}
-          favoriteIds={favoriteIds}
-          selectedId={selectedId}
-          onSelect={selectCard}
-          onToggleFavorite={toggleFavorite}
-        />
-      )}
+      <SearchResults
+        filters={filters}
+        favoriteIds={favoriteIds}
+        selectedId={selectedId}
+        onSelect={selectCard}
+        onToggleFavorite={toggleFavorite}
+      />
     </main>
   );
+}
+
+function toFilters(
+  query: string,
+  color: CardColorFilter | null,
+): CardSearchFilters | null {
+  const text = query.trim();
+
+  if (text.length === 0 && color === null) {
+    return null;
+  }
+
+  if (color === null) {
+    return { query: text };
+  }
+
+  return { query: text, color };
 }

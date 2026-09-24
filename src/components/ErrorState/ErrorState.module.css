@@ -1,0 +1,36 @@
+.panel {
+  max-width: 26rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 1.15rem 1.2rem 1.3rem;
+}
+
+.title {
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.retry {
+  margin-top: 1rem;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  padding: 0.55rem 0.8rem;
+  color: var(--gold);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.retry:hover {
+  background: rgba(230, 201, 138, 0.08);
+}

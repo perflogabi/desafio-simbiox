@@ -3,23 +3,19 @@ import { cardQueryKeys } from "./queryKeys";
 
 describe("cardQueryKeys", () => {
   it("keeps search keys under the cards namespace", () => {
-    expect(cardQueryKeys.search({ query: "lotus", page: 1 })).toEqual([
+    expect(cardQueryKeys.search({ query: "lotus" })).toEqual([
       "cards",
       "search",
-      { query: "lotus", page: 1 },
+      { query: "lotus" },
     ]);
   });
 
-  it("changes the key when the search changes", () => {
-    const first = cardQueryKeys.search({ query: "lotus", page: 1 });
-    const withColor = cardQueryKeys.search({
-      query: "lotus",
-      page: 1,
-      color: "B",
-    });
-    const nextPage = cardQueryKeys.search({ query: "lotus", page: 2 });
+  it("changes the key when the text or the color changes", () => {
+    const first = cardQueryKeys.search({ query: "lotus" });
+    const withColor = cardQueryKeys.search({ query: "lotus", color: "B" });
+    const otherText = cardQueryKeys.search({ query: "etali" });
 
     expect(withColor).not.toEqual(first);
-    expect(nextPage).not.toEqual(first);
+    expect(otherText).not.toEqual(first);
   });
 });

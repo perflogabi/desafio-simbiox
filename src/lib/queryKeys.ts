@@ -1,7 +1,7 @@
-import type { CardSearchParams } from "@/types/card";
+import type { CardSearchFilters } from "@/types/card";
 
 export const cardQueryKeys = {
   all: ["cards"] as const,
-  search: (params: CardSearchParams) =>
-    [...cardQueryKeys.all, "search", params] as const,
+  search: (filters: CardSearchFilters) =>
+    [...cardQueryKeys.all, "search", filters] as const,
 };
