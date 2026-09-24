@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useMemo, useState } from "react";
 import { CardGrid } from "@/components/CardGrid/CardGrid";
-import { CardModal } from "@/components/CardModal/CardModal";
 import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { ErrorState } from "@/components/ErrorState/ErrorState";
 import { CardSkeletonGrid } from "@/components/Skeleton/CardSkeleton";
@@ -10,6 +10,10 @@ import { useCards } from "@/hooks/useCards";
 import { CardSearchError } from "@/services/scryfall/types";
 import type { Card, CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
+
+const CardModal = dynamic(() =>
+  import("@/components/CardModal/CardModal").then((module) => module.CardModal),
+);
 
 const VISIBLE_BATCH = 18;
 const MAX_CARDS = 25;
@@ -47,21 +51,28 @@ export function SearchResults({
   const visibleCount =
     windowState.identity === identity ? windowState.count : VISIBLE_BATCH;
   const activeId = windowState.identity === identity ? selectedId : null;
-  const fetched = (
-    search.data?.pages.flatMap((page) => page.cards) ?? []
-  ).slice(0, MAX_CARDS);
+  const fetched = useMemo(
+    () =>
+      (search.data?.pages.flatMap((page) => page.cards) ?? []).slice(
+        0,
+        MAX_CARDS,
+      ),
+    [search.data],
+  );
   const total = Math.min(search.data?.pages[0]?.total ?? 0, MAX_CARDS);
   const shown = fetched.slice(0, visibleCount);
   const canRevealMore = visibleCount < fetched.length;
   const selectedCard = fetched.find((card) => card.id === activeId) ?? null;
+  const toggleShown = useCallback(
+    (cardId: string) => {
+      const card = fetched.find((item) => item.id === cardId);
 
-  function toggleShown(cardId: string) {
-    const card = fetched.find((item) => item.id === cardId);
-
-    if (card) {
-      onToggleFavorite(card);
-    }
-  }
+      if (card) {
+        onToggleFavorite(card);
+      }
+    },
+    [fetched, onToggleFavorite],
+  );
 
   if (filters === null) {
     return (
@@ -123,9 +134,7 @@ export function SearchResults({
         favoriteIds={favoriteIds}
         selectedId={activeId}
         onSelect={setSelectedId}
-        onToggleFavorite={(cardId) => {
-          toggleShown(cardId);
-        }}
+        onToggleFavorite={toggleShown}
       />
       {selectedCard ? (
         <CardModal

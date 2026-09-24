@@ -53,11 +53,13 @@ export function useDialog(onClose: () => void) {
       }
 
       const active = document.activeElement;
+      const inside =
+        active instanceof Node && dialog.contains(active) && active !== dialog;
 
-      if (event.shiftKey && active === first) {
+      if (event.shiftKey && (active === first || !inside)) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && active === last) {
+      } else if (!event.shiftKey && (active === last || !inside)) {
         event.preventDefault();
         first.focus();
       }

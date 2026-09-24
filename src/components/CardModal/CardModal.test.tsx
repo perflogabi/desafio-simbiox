@@ -111,6 +111,19 @@ describe("CardModal", () => {
     expect(opener).toHaveFocus();
   });
 
+  it("keeps Shift+Tab inside when the dialog itself is focused", () => {
+    render(<Harness />);
+    const dialog = openDialog();
+    const favorite = screen.getByRole("button", {
+      name: "Salvar nos favoritos",
+    });
+
+    expect(dialog).toHaveFocus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+
+    expect(favorite).toHaveFocus();
+  });
+
   it("keeps Tab inside the dialog", () => {
     render(<Harness />);
     openDialog();

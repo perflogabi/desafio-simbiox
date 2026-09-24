@@ -1,15 +1,25 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { CardGrid } from "@/components/CardGrid/CardGrid";
-import { CardModal } from "@/components/CardModal/CardModal";
 import { EmptyState } from "@/components/EmptyState/EmptyState";
 import { SectionRule } from "@/components/SectionRule/SectionRule";
 import { useFavorites } from "@/hooks/useFavorites";
 import { formatFavoriteCount } from "@/lib/favoriteCards";
 import type { Card } from "@/types/card";
 import styles from "@/app/favoritos/page.module.css";
+
+const CardModal = dynamic(() =>
+  import("@/components/CardModal/CardModal").then((module) => module.CardModal),
+);
 
 export function FavoriteCollection() {
   const ready = useSyncExternalStore(
@@ -20,6 +30,30 @@ export function FavoriteCollection() {
   const { cards, ids, toggle } = useFavorites();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = cards.find((card) => card.id === selectedId) ?? null;
+  const cardsRef = useRef(cards);
+  const selectedIdRef = useRef(selectedId);
+
+  useEffect(() => {
+    cardsRef.current = cards;
+    selectedIdRef.current = selectedId;
+  }, [cards, selectedId]);
+
+  const toggleById = useCallback(
+    (cardId: string) => {
+      const card = cardsRef.current.find((item) => item.id === cardId);
+
+      if (!card) {
+        return;
+      }
+
+      if (selectedIdRef.current === card.id) {
+        setSelectedId(null);
+      }
+
+      toggle(card);
+    },
+    [toggle],
+  );
 
   function toggleCard(card: Card) {
     if (selectedId === card.id) {
@@ -53,13 +87,7 @@ export function FavoriteCollection() {
           selectedId={selected?.id ?? null}
           label="Cartas favoritas"
           onSelect={setSelectedId}
-          onToggleFavorite={(cardId) => {
-            const card = cards.find((item) => item.id === cardId);
-
-            if (card) {
-              toggleCard(card);
-            }
-          }}
+          onToggleFavorite={toggleById}
         />
       ) : null}
       {selected ? (

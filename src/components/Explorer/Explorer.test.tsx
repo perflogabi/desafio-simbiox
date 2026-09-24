@@ -160,7 +160,7 @@ describe("Explorer", () => {
     fireEvent.click(open);
 
     expect(
-      screen.getByRole("dialog", { name: "Syr Konrad, the Grim" }),
+      await screen.findByRole("dialog", { name: "Syr Konrad, the Grim" }),
     ).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: "Escape" });
@@ -291,12 +291,26 @@ describe("Explorer", () => {
     ).toBeInTheDocument();
   });
 
+  it("moves between card types with the arrow keys", () => {
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.click(screen.getByRole("button", { name: "Filtros" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Tipo/ }));
+
+    const allTypes = screen.getByRole("option", { name: "Todos" });
+    expect(allTypes).toHaveFocus();
+
+    fireEvent.keyDown(allTypes, { key: "ArrowDown" });
+
+    expect(screen.getByRole("option", { name: "Criatura" })).toHaveFocus();
+  });
+
   it("closes the filter panel with Escape and returns focus", () => {
     renderWithClient(<Explorer debounceMs={0} />);
     const filters = screen.getByRole("button", { name: "Filtros" });
     filters.focus();
     fireEvent.click(filters);
 
+    expect(screen.getByRole("button", { name: "Fechar" })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "Escape" });
 
     expect(

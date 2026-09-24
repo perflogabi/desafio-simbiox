@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState } from "react";
+import { memo, useId, useState } from "react";
 import { FavoriteButton } from "@/components/FavoriteButton/FavoriteButton";
 import type { Card as MagicCard, ManaColor } from "@/types/card";
 import styles from "./Card.module.css";
@@ -17,7 +17,7 @@ type CardProps = {
   onToggleFavorite: (cardId: string) => void;
 };
 
-export function Card({
+export const Card = memo(function Card({
   card,
   isFavorite,
   isSelected,
@@ -60,7 +60,7 @@ export function Card({
             alt={`Ilustração de ${card.name}`}
             width={488}
             height={680}
-            sizes="(max-width: 719px) 100vw, (max-width: 1099px) 50vw, 16rem"
+            sizes="(max-width: 540px) calc(100vw - 2rem), (max-width: 960px) calc(50vw - 2rem), 22rem"
             priority={imagePriority}
             onError={() => {
               setImageFailed(true);
@@ -87,7 +87,7 @@ export function Card({
       </div>
     </article>
   );
-}
+});
 
 function frameFor(card: MagicCard): CardFrame {
   const [onlyColor] = card.colors;

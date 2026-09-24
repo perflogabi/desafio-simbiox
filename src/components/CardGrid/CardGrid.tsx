@@ -27,7 +27,7 @@ export function CardGrid({
             card={card}
             isFavorite={favoriteIds.has(card.id)}
             isSelected={selectedId === card.id}
-            imagePriority={index < 3}
+            imagePriority={index === 0}
             onSelect={onSelect}
             onToggleFavorite={onToggleFavorite}
           />

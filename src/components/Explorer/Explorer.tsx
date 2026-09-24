@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FilterBar } from "@/components/Filters/FilterBar";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
@@ -24,6 +24,7 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
   const appliedRarity = applied.rarity;
   const appliedType = applied.type;
   const favorites = useFavorites();
+  const toggleStoredFavorite = favorites.toggle;
   const [text, setText] = useState(appliedQuery);
   const [seenQuery, setSeenQuery] = useState(appliedQuery);
   const debouncedQuery = useDebounce(text, debounceMs);
@@ -64,9 +65,12 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
     text,
   ]);
 
-  function toggleFavorite(card: Card) {
-    favorites.toggle(card);
-  }
+  const toggleFavorite = useCallback(
+    (card: Card) => {
+      toggleStoredFavorite(card);
+    },
+    [toggleStoredFavorite],
+  );
 
   function replaceFilters(next: typeof applied) {
     router.replace(hrefForFilters(pathname, next), { scroll: false });

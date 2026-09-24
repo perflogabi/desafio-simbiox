@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDialog } from "@/components/CardModal/useDialog";
 import type { AppliedFilters } from "@/lib/urlFilters";
@@ -210,16 +210,14 @@ function FilterPanel({
           <h2 id={titleId} className={styles.heading}>
             Filtros
           </h2>
-          {mobile ? (
-            <button
-              type="button"
-              className={styles.close}
-              aria-label="Fechar"
-              onClick={onClose}
-            >
-              <CloseIcon />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={styles.close}
+            aria-label="Fechar"
+            onClick={onClose}
+          >
+            <CloseIcon />
+          </button>
         </header>
         <div className={styles.body}>
           <fieldset className={styles.group}>
@@ -315,20 +313,58 @@ function TypeSelect({
   const labelId = useId();
   const valueId = useId();
   const listId = useId();
+  const listRef = useRef<HTMLUListElement>(null);
   const [open, setOpen] = useState(false);
   const selected = value ? TYPE_LABELS[value] : "Todos";
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    listRef.current
+      ?.querySelector<HTMLElement>("[aria-selected='true']")
+      ?.focus();
+  }, [open]);
+
+  function moveTypeOption(offset: number) {
+    const options = Array.from(
+      listRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ??
+        [],
+    );
+
+    if (options.length === 0) {
+      return;
+    }
+
+    const current = options.findIndex(
+      (option) => option === document.activeElement,
+    );
+    const start = current === -1 ? 0 : current;
+    const next = Math.min(options.length - 1, Math.max(0, start + offset));
+    options[next]?.focus();
+  }
 
   return (
     <div
       className={styles.typeField}
       onKeyDown={(event) => {
-        if (!open || event.key !== "Escape") {
+        if (!open) {
           return;
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-        setOpen(false);
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+          return;
+        }
+
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          event.stopPropagation();
+          moveTypeOption(event.key === "ArrowDown" ? 1 : -1);
+        }
       }}
     >
       <span id={labelId} className={styles.legend}>
@@ -350,6 +386,7 @@ function TypeSelect({
       </button>
       {open ? (
         <ul
+          ref={listRef}
           id={listId}
           role="listbox"
           aria-labelledby={labelId}
