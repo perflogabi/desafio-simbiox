@@ -85,8 +85,8 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
 
   return (
     <main id="conteudo">
+      <h1 className="visuallyHidden">Explorar</h1>
       <div className={styles.toolbar}>
-        <h1 className={styles.title}>Compêndio</h1>
         <div className={styles.searchRow}>
           <div className={styles.search}>
             <SearchBar value={text} onValueChange={setText} />

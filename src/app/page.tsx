@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { Explorer } from "@/components/Explorer/Explorer";
-import styles from "@/components/Explorer/Explorer.module.css";
 import { PageShell } from "@/components/PageShell/PageShell";
 
 export default function HomePage() {
@@ -9,7 +8,7 @@ export default function HomePage() {
       <Suspense
         fallback={
           <main id="conteudo">
-            <h1 className={styles.title}>Compêndio</h1>
+            <h1 className="visuallyHidden">Explorar</h1>
           </main>
         }
       >

@@ -12,6 +12,7 @@ import type { CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
 
 const VISIBLE_BATCH = 18;
+const MAX_CARDS = 25;
 
 type SearchResultsProps = {
   filters: CardSearchFilters | null;
@@ -46,10 +47,12 @@ export function SearchResults({
   const visibleCount =
     windowState.identity === identity ? windowState.count : VISIBLE_BATCH;
   const activeId = windowState.identity === identity ? selectedId : null;
-  const fetched = search.data?.pages.flatMap((page) => page.cards) ?? [];
-  const total = search.data?.pages[0]?.total ?? 0;
+  const fetched = (
+    search.data?.pages.flatMap((page) => page.cards) ?? []
+  ).slice(0, MAX_CARDS);
+  const total = Math.min(search.data?.pages[0]?.total ?? 0, MAX_CARDS);
   const shown = fetched.slice(0, visibleCount);
-  const canRevealMore = visibleCount < fetched.length || search.hasNextPage;
+  const canRevealMore = visibleCount < fetched.length;
   const selectedCard = fetched.find((card) => card.id === activeId) ?? null;
 
   if (filters === null) {
@@ -124,31 +127,19 @@ export function SearchResults({
           }}
         />
       ) : null}
-      {search.isFetchNextPageError ? (
-        <ErrorState
-          title="Não foi possível carregar mais cartas"
-          description="Tente novamente."
-          onRetry={() => {
-            void search.fetchNextPage();
-          }}
-        />
-      ) : null}
       {canRevealMore ? (
         <div className={styles.moreWrap}>
           <button
             type="button"
             className={styles.more}
-            disabled={search.isFetchingNextPage}
             onClick={() => {
-              const nextCount = visibleCount + VISIBLE_BATCH;
-              setWindowState({ identity, count: nextCount });
-
-              if (nextCount > fetched.length && search.hasNextPage) {
-                void search.fetchNextPage();
-              }
+              setWindowState({
+                identity,
+                count: Math.min(visibleCount + VISIBLE_BATCH, MAX_CARDS),
+              });
             }}
           >
-            {search.isFetchingNextPage ? "Carregando" : "Carregar mais"}
+            Carregar mais
           </button>
         </div>
       ) : null}

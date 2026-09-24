@@ -12,14 +12,6 @@
   min-width: 0;
 }
 
-.title {
-  color: var(--gold);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
 .count {
   margin-bottom: 1rem;
   color: var(--text-muted);
@@ -54,12 +46,6 @@
 }
 
 @media (min-width: 720px) {
-  .toolbar {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    column-gap: 1.5rem;
-  }
-
   .searchRow {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;

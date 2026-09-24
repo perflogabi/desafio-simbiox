@@ -11,7 +11,10 @@ describe("HomePage", () => {
     renderWithClient(<HomePage />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Compêndio" }),
+      screen.queryByRole("heading", { name: "Compêndio" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Explorar" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("searchbox", { name: "Buscar cartas" }),

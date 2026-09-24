@@ -7,15 +7,18 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Header", () => {
-  it("marks Explorar as the current section", () => {
+  it("links to favorites without an Explorar item", () => {
     render(<Header />);
 
     expect(
       screen.getByRole("link", { name: "Explorador de Cartas" }),
     ).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Explorar" })).toHaveAttribute(
-      "aria-current",
-      "page",
+    expect(
+      screen.queryByRole("link", { name: "Explorar" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Favoritos" })).toHaveAttribute(
+      "href",
+      "/favoritos",
     );
     expect(screen.getByRole("link", { name: "Favoritos" })).not.toHaveAttribute(
       "aria-current",

@@ -109,6 +109,39 @@ describe("Explorer", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it("shows at most 25 cards from a filtered search", async () => {
+    const names = Array.from(
+      { length: 30 },
+      (_, index) => `Carta ${index + 1}`,
+    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ ...listOf(names), has_more: true }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar cartas" }), {
+      target: { value: "carta" },
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: /^Carta 1$/ }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Carregar mais" }));
+
+    expect(
+      screen.getByRole("heading", { name: /^Carta 25$/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /^Carta 26$/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Carregar mais" }),
+    ).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("opens card details and closes them with Escape", async () => {
     vi.stubGlobal(
       "fetch",
