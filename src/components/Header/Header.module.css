@@ -45,6 +45,13 @@
   display: none;
 }
 
+.count {
+  margin-left: 0.45rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
 .link:hover {
   color: var(--text);
 }
@@ -61,6 +68,7 @@
   }
 
   .link {
+    position: relative;
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
@@ -68,6 +76,12 @@
     border-radius: 6px;
     padding: 0;
     color: var(--gold);
+  }
+
+  .link:has(.count) {
+    width: auto;
+    gap: 0.4rem;
+    padding-inline: 0.7rem;
   }
 
   .link:hover {
@@ -102,6 +116,21 @@
   .star svg {
     width: 100%;
     height: 100%;
+  }
+
+  .count {
+    position: static;
+    margin: 0;
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--gold-strong);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: start;
   }
 }
 

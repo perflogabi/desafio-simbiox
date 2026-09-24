@@ -6,6 +6,7 @@ type CardGridProps = {
   cards: readonly MagicCard[];
   favoriteIds: ReadonlySet<string>;
   selectedId: string | null;
+  label?: string;
   onSelect: (cardId: string) => void;
   onToggleFavorite: (cardId: string) => void;
 };
@@ -14,11 +15,12 @@ export function CardGrid({
   cards,
   favoriteIds,
   selectedId,
+  label = "Resultados da busca",
   onSelect,
   onToggleFavorite,
 }: CardGridProps) {
   return (
-    <ul className={styles.grid} aria-label="Resultados da busca">
+    <ul className={styles.grid} aria-label={label}>
       {cards.map((card, index) => (
         <li key={card.id}>
           <Card

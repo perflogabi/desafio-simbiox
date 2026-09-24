@@ -8,7 +8,7 @@ import { ErrorState } from "@/components/ErrorState/ErrorState";
 import { CardSkeletonGrid } from "@/components/Skeleton/CardSkeleton";
 import { useCards } from "@/hooks/useCards";
 import { CardSearchError } from "@/services/scryfall/types";
-import type { CardSearchFilters } from "@/types/card";
+import type { Card, CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
 
 const VISIBLE_BATCH = 18;
@@ -17,7 +17,7 @@ const MAX_CARDS = 25;
 type SearchResultsProps = {
   filters: CardSearchFilters | null;
   favoriteIds: ReadonlySet<string>;
-  onToggleFavorite: (cardId: string) => void;
+  onToggleFavorite: (card: Card) => void;
 };
 
 export function SearchResults({
@@ -54,6 +54,14 @@ export function SearchResults({
   const shown = fetched.slice(0, visibleCount);
   const canRevealMore = visibleCount < fetched.length;
   const selectedCard = fetched.find((card) => card.id === activeId) ?? null;
+
+  function toggleShown(cardId: string) {
+    const card = fetched.find((item) => item.id === cardId);
+
+    if (card) {
+      onToggleFavorite(card);
+    }
+  }
 
   if (filters === null) {
     return (
@@ -115,7 +123,9 @@ export function SearchResults({
         favoriteIds={favoriteIds}
         selectedId={activeId}
         onSelect={setSelectedId}
-        onToggleFavorite={onToggleFavorite}
+        onToggleFavorite={(cardId) => {
+          toggleShown(cardId);
+        }}
       />
       {selectedCard ? (
         <CardModal
@@ -125,7 +135,7 @@ export function SearchResults({
             setSelectedId(null);
           }}
           onToggleFavorite={() => {
-            onToggleFavorite(selectedCard.id);
+            onToggleFavorite(selectedCard);
           }}
         />
       ) : null}

@@ -14,3 +14,9 @@
   letter-spacing: -0.03em;
   line-height: 0.95;
 }
+
+.count {
+  margin-top: 0.65rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}

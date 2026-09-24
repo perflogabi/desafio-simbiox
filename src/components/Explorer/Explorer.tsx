@@ -6,8 +6,9 @@ import { FilterBar } from "@/components/Filters/FilterBar";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { SectionRule } from "@/components/SectionRule/SectionRule";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useFavorites } from "@/hooks/useFavorites";
 import { hrefForFilters, readAppliedFilters } from "@/lib/urlFilters";
-import type { CardSearchFilters } from "@/types/card";
+import type { Card, CardSearchFilters } from "@/types/card";
 import styles from "./Explorer.module.css";
 import { SearchResults } from "./SearchResults";
 
@@ -22,9 +23,7 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
   const appliedQuery = applied.query;
   const appliedRarity = applied.rarity;
   const appliedType = applied.type;
-  const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(
-    () => new Set(),
-  );
+  const favorites = useFavorites();
   const [text, setText] = useState(appliedQuery);
   const [seenQuery, setSeenQuery] = useState(appliedQuery);
   const debouncedQuery = useDebounce(text, debounceMs);
@@ -65,18 +64,8 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
     text,
   ]);
 
-  function toggleFavorite(cardId: string) {
-    setFavoriteIds((current) => {
-      const next = new Set(current);
-
-      if (next.has(cardId)) {
-        next.delete(cardId);
-      } else {
-        next.add(cardId);
-      }
-
-      return next;
-    });
+  function toggleFavorite(card: Card) {
+    favorites.toggle(card);
   }
 
   function replaceFilters(next: typeof applied) {
@@ -124,7 +113,7 @@ export function Explorer({ debounceMs = 300 }: ExplorerProps) {
           rarity: appliedRarity,
           type: appliedType,
         })}
-        favoriteIds={favoriteIds}
+        favoriteIds={favorites.ids}
         onToggleFavorite={toggleFavorite}
       />
     </main>

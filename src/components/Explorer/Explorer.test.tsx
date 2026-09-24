@@ -322,6 +322,40 @@ describe("Explorer", () => {
     expect(screen.getByRole("dialog", { name: "Filtros" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Fechar" })).toBeInTheDocument();
   });
+
+  it("remembers a favorite after the explorer is opened again", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementation(() =>
+          Promise.resolve(jsonResponse(listOf(["Syr Konrad, the Grim"]))),
+        ),
+    );
+
+    const view = renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar cartas" }), {
+      target: { value: "konrad" },
+    });
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "Salvar Syr Konrad, the Grim nos favoritos",
+      }),
+    );
+    view.unmount();
+
+    renderWithClient(<Explorer debounceMs={0} />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar cartas" }), {
+      target: { value: "konrad" },
+    });
+
+    expect(
+      await screen.findByRole("button", {
+        name: "Remover Syr Konrad, the Grim dos favoritos",
+      }),
+    ).toBeInTheDocument();
+  });
 });
 
 function listOf(names: readonly string[]) {

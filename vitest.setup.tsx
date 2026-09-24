@@ -8,6 +8,7 @@ configure({ asyncUtilTimeout: 4_000 });
 afterEach(() => {
   cleanup();
   resetSearchParams();
+  window.localStorage.clear();
 });
 
 vi.mock("next/navigation", async () => {
