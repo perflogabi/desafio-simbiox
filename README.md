@@ -28,3 +28,11 @@ npm run test:e2e
 npm run format
 npm run format:check
 ```
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+A aplicação fica disponível em [http://localhost:3000](http://localhost:3000).
