@@ -36,3 +36,7 @@ docker compose up --build
 ```
 
 A aplicação fica disponível em [http://localhost:3000](http://localhost:3000).
+
+## CI
+
+O workflow em `.github/workflows/ci.yml` roda lint, typecheck, testes e build em cada push e pull request.
